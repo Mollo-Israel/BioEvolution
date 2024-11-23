@@ -7,6 +7,7 @@ public class Player : MonoBehaviour
     public int vida;
     // Velocidad de movimiento del jugador
     public float velocidadMovimiento = 5f;
+    public int pruebitaXD;
 
     // Referencia al Rigidbody2D
     private Rigidbody2D rb;
