@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
+    public int vida;
     // Velocidad de movimiento del jugador
     public float velocidadMovimiento = 5f;
 
