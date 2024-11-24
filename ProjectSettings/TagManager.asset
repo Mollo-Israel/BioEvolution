@@ -12,6 +12,7 @@ TagManager:
   - LimitY+
   - LimitY-
   - EnemyNeutral
+  - Suelo
   layers:
   - Default
   - TransparentFX
