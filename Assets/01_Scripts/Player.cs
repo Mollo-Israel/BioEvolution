@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour
@@ -18,6 +19,8 @@ public class Player : MonoBehaviour
     public Image barraVida;
     public Image barraComida;
 
+    //public Text textoVida;
+
     // Valores de vida y comida
     private float vidaMaxima = 10f;
     private float vidaActual = 3;
@@ -29,6 +32,10 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+        //asignar vida al player
+        vidaActual = vidaMaxima;
+        //textoVida.text = "Life = " + vidaActual;
+
 
         // Inicializar Rigidbody2D
         rb = GetComponent<Rigidbody2D>();
@@ -78,6 +85,20 @@ public class Player : MonoBehaviour
         }
 
         
+    }
+
+    public void TakeDamage(float dmg)
+    {
+
+        vidaActual -= dmg;
+        //textoVida.text = "Life = " + vidaActual;
+        barraVida.fillAmount = vidaActual / vidaMaxima;
+        if (vidaActual <= 0)
+        {
+            SceneManager.LoadScene("Start_Game");
+            //Destroy(gameObject);
+        }
+
     }
 
     void ActualizarTextoPuntuacion()

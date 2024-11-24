@@ -5,11 +5,14 @@ using UnityEngine.UI;
 
 public class PuntuacionManager : MonoBehaviour
 {
+    //crar instancia de puntuacion para acceder a esta clase
+    public static PuntuacionManager intance;
+
     // Variable para almacenar la puntuación
     public int puntuacion = 0;
 
     // Variable para mostrar la puntuación en la UI
-    public Text textoPuntuacion;
+    public Text textoPuntuacionadnnormal;
 
     void Start()
     {
@@ -27,6 +30,11 @@ public class PuntuacionManager : MonoBehaviour
     // Método para actualizar el texto en pantalla
     void ActualizarPuntuacion()
     {
-        textoPuntuacion.text = "X: " + puntuacion.ToString();  // Muestra el puntaje en el formato adecuado
+        textoPuntuacionadnnormal.text = "X: " + puntuacion.ToString();  // Muestra el puntaje en el formato adecuado
+    }
+    public void ActualizarADNfuerte(int adnStrong)
+    {
+        //visualizar texto con adn fuerte
+
     }
 }

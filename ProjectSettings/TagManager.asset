@@ -6,6 +6,12 @@ TagManager:
   tags:
   - Organismo
   - Food
+  - Enemy
+  - LimitX-
+  - LimitX+
+  - LimitY+
+  - LimitY-
+  - EnemyNeutral
   layers:
   - Default
   - TransparentFX
