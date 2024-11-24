@@ -1,25 +1,48 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class Player : MonoBehaviour
-{
-    public int vida;
-    // Velocidad de movimiento del jugador
+{// Velocidad de movimiento del jugador
+ // Velocidad de movimiento del jugador
     public float velocidadMovimiento = 5f;
-    public int pruebitaXD;
 
     // Referencia al Rigidbody2D
     private Rigidbody2D rb;
 
+    // Referencia al texto de puntuación
+    public Text textoPuntuacion;
+
+    // Referencia a las barras de vida y comida
+    public Image barraVida;
+    public Image barraComida;
+
+    // Valores de vida y comida
+    private float vidaMaxima = 10f;
+    private float vidaActual = 3;
+    private float comidaMaxima = 10f;
+    private float comidaActual = 0;
+
+    // Puntos de ADN
+    private int puntos = 0;
+
     void Start()
     {
-        // Obtener el componente Rigidbody2D del jugador
+
+        // Inicializar Rigidbody2D
         rb = GetComponent<Rigidbody2D>();
+
+        // Inicializar valores de vida y comida
+        
+        // Actualizar UI inicial
+        ActualizarBarras();
+        ActualizarTextoPuntuacion();
     }
 
     void Update()
     {
+        barraComida.fillAmount = comidaActual / comidaMaxima;
         // Llamar a la función para mover el jugador
         MoverJugador();
     }
@@ -35,7 +58,40 @@ public class Player : MonoBehaviour
 
         // Aplicar el movimiento al Rigidbody2D
         rb.velocity = movimiento;
+    }
 
-        // El Rigidbody2D manejará las colisiones automáticamente con el BoxCollider2D de los límites
+    void OnCollisionEnter2D(Collision2D collision)
+    {
+        // Si colisiona con un organismo
+        if (collision.gameObject.CompareTag("Organismo"))
+        {
+            puntos += 1; // Aumenta los puntos de ADN
+            ActualizarTextoPuntuacion(); // Actualiza el texto en pantalla
+            Destroy(collision.gameObject); // Destruye el organismo
+        }
+
+        // Si colisiona con comida
+        if (collision.gameObject.CompareTag("Food"))
+        {
+            comidaActual += 1;
+            Destroy(collision.gameObject); // Destruye la comida
+        }
+
+        
+    }
+
+    void ActualizarTextoPuntuacion()
+    {
+        textoPuntuacion.text = "X: " + puntos.ToString();
+    }
+
+    void ActualizarBarras()
+    {
+        // Actualiza las barras de vida y comida
+        if (barraVida != null)
+            barraVida.fillAmount = vidaActual / vidaMaxima;
+
+        if (barraComida != null)
+            barraComida.fillAmount = comidaActual / comidaMaxima;
     }
 }

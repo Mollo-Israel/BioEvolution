@@ -5,23 +5,41 @@ using UnityEngine.UI;
 
 public class Organismo : MonoBehaviour
 {
-    // Variable para definir la cantidad de puntos que da este organismo
+    // Referencia al texto de puntuación (debe arrastrarse desde el inspector)
+    public Text textoPuntuacion;
+
+    // Cantidad de puntos que otorga este organismo
     public int puntos = 1;
 
-    // Referencia al PuntuacionManager (para aumentar la puntuación)
-    public PuntuacionManager puntuacionManager;
-
-    // Método que se llama cuando hay una colisión
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Verificar si el objeto que colisiona es el jugador
+        // Verificar si el objeto que colisiona tiene el tag "Player"
         if (collision.gameObject.CompareTag("Player"))
         {
-            // Llamar al método de aumentar puntuación en el PuntuacionManager
-            puntuacionManager.AumentarPuntuacion(puntos);
+            // Asegurarse de que el texto tiene el formato esperado
+            if (textoPuntuacion.text.Contains(":"))
+            {
+                // Dividir el texto y obtener la puntuación actual
+                string[] partes = textoPuntuacion.text.Split(':');
+                if (partes.Length > 1)
+                {
+                    // Parsear la puntuación actual y sumarle los puntos de este organismo
+                    int puntuacionActual = int.Parse(partes[1].Trim());
+                    puntuacionActual += puntos;
 
-            // Destruir el organismo (o hacer que desaparezca)
+                    // Actualizar el texto con la nueva puntuación
+                    textoPuntuacion.text = "X: " + puntuacionActual;
+                }
+            }
+            else
+            {
+                // Si el formato no es correcto, inicializar la puntuación
+                textoPuntuacion.text = "X: " + puntos;
+            }
+
+            // Destruir el organismo (prefab)
             Destroy(gameObject);
         }
     }
+
 }

@@ -27,6 +27,6 @@ public class PuntuacionManager : MonoBehaviour
     // Método para actualizar el texto en pantalla
     void ActualizarPuntuacion()
     {
-        textoPuntuacion.text = "Puntuación: " + puntuacion.ToString();  // Muestra el puntaje en el formato adecuado
+        textoPuntuacion.text = "X: " + puntuacion.ToString();  // Muestra el puntaje en el formato adecuado
     }
 }
