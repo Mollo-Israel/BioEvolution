@@ -19,7 +19,11 @@ public class Player : MonoBehaviour
     public Image barraVida;
     public Image barraComida;
 
-    //public Text textoVida;
+    //texto barra de vida
+    public Text textoVida;
+
+    //texto comida
+    public Text textoComida;
 
     // Valores de vida y comida
     private float vidaMaxima = 10f;
@@ -32,6 +36,9 @@ public class Player : MonoBehaviour
 
     void Start()
     {
+
+        textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
+        textoComida.text = comidaActual.ToString() + "/" + comidaActual.ToString();
         //asignar vida al player
         vidaActual = vidaMaxima;
         //textoVida.text = "Life = " + vidaActual;
@@ -50,8 +57,19 @@ public class Player : MonoBehaviour
     void Update()
     {
         barraComida.fillAmount = comidaActual / comidaMaxima;
+        textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
+        textoComida.text = comidaActual.ToString() + "/" + comidaActual.ToString();
         // Llamar a la función para mover el jugador
         MoverJugador();
+        DescontarComida();
+    }
+    void DescontarComida()
+    {
+        //agragar timer para descontar cada cierto tiempo
+        if (comidaActual == 0)
+        {
+            vidaActual--;
+        }
     }
 
     void MoverJugador()
@@ -91,8 +109,8 @@ public class Player : MonoBehaviour
     {
 
         vidaActual -= dmg;
-        //textoVida.text = "Life = " + vidaActual;
         barraVida.fillAmount = vidaActual / vidaMaxima;
+        textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
         if (vidaActual <= 0)
         {
             SceneManager.LoadScene("Start_Game");
