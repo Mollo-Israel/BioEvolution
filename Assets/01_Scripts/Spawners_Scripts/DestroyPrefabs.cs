@@ -7,10 +7,10 @@ public class DestroyPrefabs : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         // Check if the object that touched the ground has the tag "Point"
-        if (collision.gameObject.CompareTag("Suelo"))
+        if (collision.gameObject.CompareTag("LimitY-"))
         {
             // Destroy the object
-            Destroy(collision.gameObject);
+            Destroy(gameObject);
         }
     }
 }
