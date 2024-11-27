@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class CameraFollow2D : MonoBehaviour
 {
-    [Header("Target to Follow")]
+     [Header("Target to Follow")]
     public Transform player; // Reference to the player's Transform
 
     [Header("Offset Settings")]

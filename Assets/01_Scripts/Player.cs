@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
 
     void ActualizarTextoPuntuacion()
     {
-        textoPuntuacion.text = "X: " + puntos.ToString();
+        textoPuntuacion.text = "X" + puntos.ToString();
     }
 
     void ActualizarBarras()
