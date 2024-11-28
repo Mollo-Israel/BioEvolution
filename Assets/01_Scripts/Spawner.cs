@@ -10,8 +10,8 @@ public class Spawner : MonoBehaviour
     public AudioClip entradaLeviatanClip;    // Clip para el sonido de la entrada del Leviatán
     public GameObject leviatanPrefab;        // El prefab del Leviatán
     public Transform spawnPoint;             // Punto de aparición del Leviatán
-    public int minutes = 0;                  // Minutos en el temporizador
-    public int seconds = 5;                  // Segundos en el temporizador
+    public int minutes = 2;                  // Cambia los minutos a 2
+    public int seconds = 30;                 // Cambia los segundos a 30
     public Text timerText;                   // Texto del temporizador en la UI
 
     private int totalTime;                   // Tiempo total en segundos
@@ -37,17 +37,22 @@ public class Spawner : MonoBehaviour
         while (totalTime > 0)
         {
             yield return new WaitForSeconds(1);
-            totalTime--;
+            totalTime--;  // Disminuye el tiempo en cada segundo
+
+            // Mostrar en la consola el tiempo restante para depuración
+            Debug.Log("Tiempo restante: " + totalTime);
 
             // Reproducir el sonido del reloj si quedan 5 segundos
-            if (totalTime == 5 && !audioSource.isPlaying)
+            if (totalTime == 8 && !audioSource.isPlaying)  // Verifica si quedan 5 segundos y si no está sonando
             {
-                audioSource.PlayOneShot(relojClip);
+                Debug.Log("Reproduciendo sonido de reloj...");
+                audioSource.PlayOneShot(relojClip);  // Reproduce el sonido del reloj
             }
 
             UpdateTimerText(); // Actualiza el texto del temporizador
         }
 
+        // Si el Leviatán aún no ha sido instanciado
         if (!leviatanSpawned)
         {
             SpawnLeviatan();  // Instancia el Leviatán
@@ -56,12 +61,16 @@ public class Spawner : MonoBehaviour
 
     void SpawnLeviatan()
     {
-        leviatanSpawned = true;
+        leviatanSpawned = true;  // Marca el Leviatán como instanciado
 
-        // Reproducir el sonido de entrada del Leviatán
-        audioSource.PlayOneShot(entradaLeviatanClip);
+
+        Debug.Log("Reproduciendo sonido de entrada del Leviatán...");
+        audioSource.PlayOneShot(entradaLeviatanClip);  // Reproduce el sonido de entrada del Leviatán
+
 
         // Instanciamos el Leviatán en el punto de aparición
         GameObject leviatan = Instantiate(leviatanPrefab, spawnPoint.position, Quaternion.identity);
+        Debug.Log("Leviatán instanciado");
     }
 }
+

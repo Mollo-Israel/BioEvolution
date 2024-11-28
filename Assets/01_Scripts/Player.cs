@@ -5,8 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Player : MonoBehaviour
-{// Velocidad de movimiento del jugador
- // Velocidad de movimiento del jugador
+{
     public float velocidadMovimiento = 5f;
 
     // Referencia al Rigidbody2D
@@ -19,10 +18,10 @@ public class Player : MonoBehaviour
     public Image barraVida;
     public Image barraComida;
 
-    //texto barra de vida
+    // Texto barra de vida
     public Text textoVida;
 
-    //texto comida
+    // Texto comida
     public Text textoComida;
 
     // Valores de vida y comida
@@ -34,21 +33,24 @@ public class Player : MonoBehaviour
     // Puntos de ADN
     private int puntos = 0;
 
+    // Límites del área donde el jugador puede moverse (en el eje X y Y)
+    public float limiteIzquierdo = -24f;
+    public float limiteDerecho = 24f;
+    public float limiteInferior = -20f;
+    public float limiteSuperior = 20f;
+
     void Start()
     {
-
         textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
-        textoComida.text = comidaActual.ToString() + "/" + comidaActual.ToString();
-        //asignar vida al player
-        vidaActual = vidaMaxima;
-        //textoVida.text = "Life = " + vidaActual;
+        textoComida.text = comidaActual.ToString() + "/" + comidaMaxima.ToString();
 
+        // Asignar vida al player
+        vidaActual = vidaMaxima;
 
         // Inicializar Rigidbody2D
         rb = GetComponent<Rigidbody2D>();
 
         // Inicializar valores de vida y comida
-        
         // Actualizar UI inicial
         ActualizarBarras();
         ActualizarTextoPuntuacion();
@@ -59,13 +61,15 @@ public class Player : MonoBehaviour
         barraComida.fillAmount = comidaActual / comidaMaxima;
         textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
         textoComida.text = comidaActual.ToString() + "/" + comidaActual.ToString();
+
         // Llamar a la función para mover el jugador
         MoverJugador();
         DescontarComida();
     }
+
     void DescontarComida()
     {
-        //agragar timer para descontar cada cierto tiempo
+        // Agragar timer para descontar cada cierto tiempo
         if (comidaActual == 0)
         {
             vidaActual--;
@@ -83,6 +87,14 @@ public class Player : MonoBehaviour
 
         // Aplicar el movimiento al Rigidbody2D
         rb.velocity = movimiento;
+
+        // Limitar la posición del jugador dentro de los límites definidos
+        Vector2 posicionJugador = rb.position;
+        posicionJugador.x = Mathf.Clamp(posicionJugador.x, limiteIzquierdo, limiteDerecho);
+        posicionJugador.y = Mathf.Clamp(posicionJugador.y, limiteInferior, limiteSuperior);
+
+        // Actualizar la posición del jugador para que no sobrepase los límites
+        rb.position = posicionJugador;
     }
 
     void OnCollisionEnter2D(Collision2D collision)
@@ -101,22 +113,18 @@ public class Player : MonoBehaviour
             comidaActual += 1;
             Destroy(collision.gameObject); // Destruye la comida
         }
-
-        
     }
 
     public void TakeDamage(float dmg)
     {
-
         vidaActual -= dmg;
         barraVida.fillAmount = vidaActual / vidaMaxima;
         textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
         if (vidaActual <= 0)
         {
             SceneManager.LoadScene("Start_Game");
-            //Destroy(gameObject);
+            // Destroy(gameObject);
         }
-
     }
 
     void ActualizarTextoPuntuacion()

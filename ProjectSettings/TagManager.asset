@@ -13,6 +13,7 @@ TagManager:
   - LimitY-
   - EnemyNeutral
   - Suelo
+  - muerteLeviatan
   layers:
   - Default
   - TransparentFX
