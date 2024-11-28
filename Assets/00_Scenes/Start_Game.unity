@@ -4977,16 +4977,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e03b1daf3f087894f9cea146c4166554, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidadMovimiento: 2
+  velocidadMovimiento: 10
   textoPuntuacion: {fileID: 1942206121}
   barraVida: {fileID: 1049320879}
   barraComida: {fileID: 1116762646}
   textoVida: {fileID: 790271301}
   textoComida: {fileID: 1250784736}
   limiteIzquierdo: -24
-  limiteDerecho: 24
+  limiteDerecho: 25
   limiteInferior: -22
   limiteSuperior: 22
+  tiempoParaPerderComida: 5
 --- !u!1 &1204880422
 GameObject:
   m_ObjectHideFlags: 0
