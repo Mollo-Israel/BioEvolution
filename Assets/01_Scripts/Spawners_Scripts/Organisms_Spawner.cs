@@ -12,7 +12,8 @@ public class Organisms_Spawner : MonoBehaviour
     public float tiempoEntreSpawns = 0.5f;
 
     // Rango de aparición en el eje X
-    public float rangoX = 10f;
+    public float rangoXD = 22f;
+    public float rangoXI = -20f;
 
     // Rango de aparición en el eje Y (la posición siempre será en la parte superior)
     public float rangoY = 5f;
@@ -30,7 +31,7 @@ public class Organisms_Spawner : MonoBehaviour
     void GenerarOrganismo()
     {
         // Calcula una posición aleatoria dentro del rango X
-        float posX = Random.Range(-rangoX, rangoX);
+        float posX = Random.Range(rangoXI, rangoXD);
 
         // La posición Y siempre será el valor máximo
         float posY = rangoY;

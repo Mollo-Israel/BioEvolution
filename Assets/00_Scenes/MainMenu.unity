@@ -1493,6 +1493,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c31498f5db2dccb4288a99f64ac8573a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sonidoAmbiente: {fileID: 8300000, guid: 977c1c2d07c3b7546b27a9e072e70eb5, type: 3}
+  buttonStart: {fileID: 8300000, guid: 9fb9f5f9f1d39c84d96f6816ea1c96ab, type: 3}
+  audioSource: {fileID: 1951813091}
 --- !u!114 &1951813086
 MonoBehaviour:
   m_ObjectHideFlags: 0
