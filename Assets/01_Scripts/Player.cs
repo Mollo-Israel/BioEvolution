@@ -6,7 +6,10 @@ using UnityEngine.UI;
 
 public class Player : MonoBehaviour
 {
+    public TiendaSkills tienda;
+
     public float velocidadMovimiento = 5f;
+    public int nivelMejorVelocidad = 0;
 
     // Referencia al Rigidbody2D
     private Rigidbody2D rb;
@@ -31,13 +34,19 @@ public class Player : MonoBehaviour
     private float comidaActual = 0f;
 
     // Puntos de ADN
-    private int puntos = 0;
+    public int puntos = 0;
 
     // Límites del área donde el jugador puede moverse (en el eje X y Y)
     public float limiteIzquierdo = -24f;
     public float limiteDerecho = 24f;
     public float limiteInferior = -20f;
     public float limiteSuperior = 20f;
+
+    public Text textoCostoMejora;
+    public Text textoPuntos;
+    // Costo de la mejora
+    private int costoMejoraVelocidad = 5;
+    private int costodefensa = 8;
 
     // Temporizador para descontar vida
     private float timerComida = 0f;
@@ -62,6 +71,7 @@ public class Player : MonoBehaviour
         // Actualizar UI inicial
         ActualizarBarras();
         ActualizarTextoPuntuacion();
+        
     }
 
     void Update()
@@ -148,6 +158,7 @@ public class Player : MonoBehaviour
             puntos += 1; // Aumenta los puntos de ADN
             ActualizarTextoPuntuacion(); // Actualiza el texto en pantalla
             Destroy(collision.gameObject); // Destruye el organismo
+            //tienda.ActualizarTextoPuntos();
         }
 
         // Si colisiona con comida
@@ -185,7 +196,7 @@ public class Player : MonoBehaviour
     {
         textoPuntuacion.text = "X" + puntos.ToString();
     }
-
+    
     void ActualizarBarras()
     {
         // Actualiza las barras de vida y comida
@@ -195,4 +206,17 @@ public class Player : MonoBehaviour
         if (barraComida != null)
             barraComida.fillAmount = comidaActual / comidaMaxima;
     }
+    public void ComprarMejoraVelocidad()
+    {
+        if (puntos >= costoMejoraVelocidad)
+        {
+            puntos -= costoMejoraVelocidad;
+            nivelMejorVelocidad++;
+            velocidadMovimiento += 1f; // Incrementa la velocidad de movimiento
+            ActualizarTextoPuntuacion();
+            tienda.ActualizarTextoPuntos(); // Actualiza los puntos después de la compra
+            // Metodo o if para el limite de nivel de la habilidad (speed)
+        }
+    }
+
 }
