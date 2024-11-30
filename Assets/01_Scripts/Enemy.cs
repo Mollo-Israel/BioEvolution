@@ -6,296 +6,149 @@ using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
-    //tipo de enemigo
+    // Tipo de enemigo
     public EnemyType type;
 
-    //vida max de enemigo
+    // Vida del enemigo
     public float maxLife = 3;
+    private float life;
 
-    //vida actual esta va perdiendo o dismuniyendo
-    float life = 3;
-
-    //velocidad max de enemigo
+    // Velocidad y daño
     public float speed = 2;
-
-    //dano que realiza el enemigo
     public float damage;
 
-    //rango de busqueda del enemigo
+    // Rango de visión
     public float range = 4;
+    private bool targetInRange = false;
 
-    //saber si se encuentra en el rango el player
-    bool targetInRange = false;
-
-    //puntos de score que vale cada enemigo
+    // Puntos de ADN fuerte
     public int ADNstrongValue;
 
+    // Variables para movimiento
+    private Vector2 targetPosition;  // Posición hacia la cual se moverá
+    private Transform target;  // Jugador
+    private Rigidbody2D rb;  // Rigidbody del enemigo
 
-
-    // Variables para controlar el movimiento
-    private Vector2 direction = Vector2.right; // Dirección inicial (hacia la derecha)
-    private float moveRangeX = 5f; // Rango de movimiento en el eje X (distancia izquierda-derecha)
-    private float moveStepY = 1f; // Distancia que sube en Y al finalizar un ciclo
-    private Vector2 startPosition; // Posición inicial para calcular el rango de movimiento
-
-
-
-    //saber PLAYER position
-    Transform target;
-
-    //prefab objeto que se genera del adn fuerte
+    // Prefab ADN fuerte que se genera al morir
     public GameObject ADNStrong;
 
-    ////efecto de muerte
-    //public GameObject explosionEffect;
-
-    ////barra de vida o puntos de vida visuales
-    //public Image lifeBar;
-
-    // Start is called before the first frame update
+    // Configuración inicial
     void Start()
     {
-
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         target = player.transform;
 
-        // Configurar los atributos según el tipo de enemigo al inicio
+        // Inicializamos los atributos del enemigo según el tipo
         ModifyAttributes(type);
 
-        // Guardar la posición inicial del enemigo
-        startPosition = transform.position;
+        // Establecer la vida inicial
+        life = maxLife;
 
-        // Configurar la dirección inicial
-        direction = Vector2.right; // Empieza moviéndose hacia la derecha
+        // Obtener el Rigidbody del enemigo
+        rb = GetComponent<Rigidbody2D>();
+
+        // Definir una posición objetivo inicial
+        targetPosition = GetRandomTargetPosition();
     }
 
-    // Update is called once per frame
+    // Actualización en cada frame
     void Update()
     {
+        // Comportamiento según el tipo de enemigo
         switch (type)
         {
             case EnemyType.EVO1:
-
-                ModifyAttributes(type);
-                if (targetInRange)
-                {
-                    RotateToTarget();
-                    MoveForward();
-                }
-                else
-                {
-                    //Movimiento cuando el player no esta en rango
-                    MoveIdle();
-                    SearchTarget();
-                }
-
-                break;
-
-            case EnemyType.EVO2 :
-                ModifyAttributes(type);
-                //si encuentra en rango al player
-                if (targetInRange)
-                {
-
-                    RotateToTarget();
-                    MoveForward();
-                }
-                else
-                {
-                    //Movimiento cuando el player no esta en rango
-                    MoveIdle();
-                    SearchTarget();
-                }
-
-                break;
+            case EnemyType.EVO2:
             case EnemyType.EVO3:
-
-                ModifyAttributes(type);   
-                //si encuentra en rango al player
-                if (targetInRange)
-                {
-                    RotateToTarget();
-                    MoveForward();
-                }
-                else
-                {
-                    //Movimiento cuando el player no esta en rango
-                    MoveIdle();
-                    SearchTarget();
-                }
-                break;
             case EnemyType.EVO4:
-                //si encuentra en rango al player
+                ModifyAttributes(type);
                 if (targetInRange)
                 {
-                    RotateToTarget();
-                    MoveForward();
+                    // Si el jugador está dentro del rango, perseguirlo
+                    MoveTowardsPlayer();
+                    RotateToTarget();  // Rotar hacia el jugador
                 }
                 else
                 {
-                    MoveIdle();
+                    // Si no, moverse aleatoriamente
+                    MoveToRandomPosition();
+                    RotateMovement();  // Rotar hacia la dirección de movimiento aleatorio
                     SearchTarget();
                 }
                 break;
+
             case EnemyType.NEVO1:
-                //movimiento de neutral
-                MoveIdle();
-
-                break;
             case EnemyType.NEVO2:
-                //movimiento de neutral
-                MoveIdle();
-
-                break;
             case EnemyType.NEVO3:
-                //movimiento de neutral
-                MoveIdle();
-
+                MoveToRandomPosition(); // Movimiento aleatorio
+                RotateMovement();  // Rotar hacia el movimiento aleatorio
                 break;
         }
     }
-    //aumento de atributos segun el typo de enemigo
+
+    // Ajustar atributos según el tipo de enemigo
     public void ModifyAttributes(EnemyType type)
     {
-        if(type == EnemyType.EVO1)
+        if (type == EnemyType.EVO1)
         {
             damage = 1;
             range = 0.5f;
             maxLife = 10;
+            speed = 0.5f;
+        }
+        else if (type == EnemyType.EVO2)
+        {
+            damage = 3;
+            range = 1;
+            maxLife = 20;
             speed = 1;
+        }
+        else if (type == EnemyType.EVO3)
+        {
+            damage = 5;
+            range = 2;
+            maxLife = 40;
+            speed = 2;
         }
         else
         {
-            if(type == EnemyType.EVO2)
-            {
-                damage = 3;
-                range = 1;
-                maxLife = 20;
-                speed = 2;
-            }
-            else
-            {
-                if (type == EnemyType.EVO3)
-                {
-                    damage = 5;
-                    range = 2;
-                    maxLife = 40;
-                    speed = 3;
-                }
-                else
-                {
-                    damage = 10;
-                    range = 3;
-                    maxLife = 80;
-                    speed = 8;
-                }
-            }
-        } 
-    }
-    public void MoveIdle()
-    {
-        // Verificar si se alcanzó el límite en X
-        if (Mathf.Abs(transform.position.x - startPosition.x) >= moveRangeX)
-        {
-            // Cambiar dirección en X (zigzag)
-            direction.x *= -1;
-        }
-
-        // Verificar si el enemigo está subiendo y llegó al límite superior
-        if (direction.y > 0 && transform.position.y >= Camera.main.orthographicSize)
-        {
-            // Cambiar dirección hacia abajo en el eje Y
-            direction.y = -1;
-        }
-
-        // Verificar si el enemigo está bajando y llegó al límite inferior
-        if (direction.y < 0 && transform.position.y <= -Camera.main.orthographicSize)
-        {
-            // Cambiar dirección hacia arriba en el eje Y
-            direction.y = 1;
-        }
-
-        // Mover el enemigo en la dirección actual
-        transform.Translate(direction * speed * Time.deltaTime);
-    }
-
-
-    //recibir dano
-    public void TakeDamage(float dmg)
-    {
-        //descontar vida segun el dano que entra
-        life -= dmg;
-
-        ////barra de vida actulizar barra de vida visual 
-        //lifeBar.fillAmount = life / maxLife;
-        //al morir, si la vida actual es igual a 0 o menor
-        if (life <= 0)
-        {
-            //generar adn fuerte al morir el enemigo segun el enemigo que se elimino
-            if (type == EnemyType.EVO1)
-            {
-                //instanciar adnfuerte
-                Instantiate(ADNStrong, transform.position, transform.rotation);
-
-                //el adn fuerte que da es de 3
-                ADNstrongValue = 3;
-                PuntuacionManager.intance.ActualizarADNfuerte(ADNstrongValue);
-            }
-            else
-            {
-                if(type == EnemyType.EVO2)
-                {
-                    //instanciar adnfuerte
-                    Instantiate(ADNStrong, transform.position, transform.rotation);
-
-                    //el adn fuerte que da es de 6
-                    ADNstrongValue = 6;
-                    PuntuacionManager.intance.ActualizarADNfuerte(ADNstrongValue);
-                }
-                else
-                {
-                    if(type == EnemyType.EVO3)
-                    {
-                        //instanciar adnfuerte
-                        Instantiate(ADNStrong, transform.position, transform.rotation);
-
-                        //el adn fuerte que da es de 9
-                        ADNstrongValue = 9;
-                        PuntuacionManager.intance.ActualizarADNfuerte(ADNstrongValue);
-                    }
-                    else
-                    {
-                        //instanciar adnfuerte
-                        Instantiate(ADNStrong, transform.position, transform.rotation);
-
-                        //el adn fuerte que da es de 20
-                        ADNstrongValue = 20;
-                        PuntuacionManager.intance.ActualizarADNfuerte(ADNstrongValue);
-                    }
-                }
-            }
-            ////el enemigo se destruye
-            //Instantiate(explosionEffect, transform.position, transform.rotation);
-
-            //destruir el objeto
-            Destroy(gameObject);
+            damage = 10;
+            range = 3;
+            maxLife = 80;
+            speed = 3;
         }
     }
 
-    //rotar en angulo del player
-    void RotateToTarget()
+    // Movimiento aleatorio dentro de un rango
+    void MoveToRandomPosition()
     {
-        Vector2 dir = target.position - transform.position;
-        float angleZ = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg + 0;
-        transform.rotation = Quaternion.Euler(0, 0, -angleZ);
-    }
-    //mover hacia el player
-    void MoveForward()
-    {
-        transform.Translate(Vector2.up * speed * Time.deltaTime);
+        // Si el enemigo ha llegado a la posición objetivo, establecer una nueva posición aleatoria
+        if (Vector2.Distance(transform.position, targetPosition) < 0.2f)
+        {
+            targetPosition = GetRandomTargetPosition();
+        }
+
+        // Mover hacia la posición objetivo
+        Vector2 direction = (targetPosition - (Vector2)transform.position).normalized;
+        rb.velocity = direction * speed;  // Usamos la velocidad del Rigidbody para movimiento más fluido
     }
 
-    //buscar al player
+    // Obtener una posición aleatoria dentro de un rango determinado
+    Vector2 GetRandomTargetPosition()
+    {
+        float randomX = Random.Range(-5f, 5f);  // Ajusta el rango de X según lo que necesites
+        float randomY = Random.Range(-3f, 3f);  // Ajusta el rango de Y según lo que necesites
+        return new Vector2(transform.position.x + randomX, transform.position.y + randomY);
+    }
+
+    // Movimiento hacia el jugador cuando esté dentro del rango
+    void MoveTowardsPlayer()
+    {
+        Vector2 direction = (target.position - transform.position).normalized;
+        rb.velocity = direction * speed;  // Mover al jugador con la velocidad del Rigidbody
+    }
+
+    // Buscar al jugador dentro del rango
     void SearchTarget()
     {
         float distance = Vector2.Distance(transform.position, target.position);
@@ -308,59 +161,91 @@ public class Enemy : MonoBehaviour
             targetInRange = false;
         }
     }
-    //al recibir un impacto
+
+    // Colisiones con el jugador
     void OnCollisionEnter2D(Collision2D collision)
+{
+
+     // Ignorar colisiones con otros enemigos
+     if (collision.gameObject.CompareTag("Enemy"))
+     {
+         Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+     }
+     // Ignorar colisiones con Food
+     else if (collision.gameObject.CompareTag("Food"))
+     {
+         Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+     }
+     // Ignorar colisiones con Organismo
+     else if (collision.gameObject.CompareTag("Organismo"))
+     {
+         Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+     }
+     // Si colisiona con el jugador
+     else if (collision.gameObject.CompareTag("Player"))
+     {
+         Player p = collision.gameObject.GetComponent<Player>();
+         if (p != null)
+         {
+             Debug.Log($"El enemigo de tipo {type} ha infligido {damage} puntos de daño al jugador.");
+             p.TakeDamage(damage);
+         }
+     }
+}
+
+    // Al recibir daño
+    public void TakeDamage(float dmg)
     {
-        // Si el enemigo colisiona con la pared limitante izquierda (LimitX-)
-        if (collision.gameObject.CompareTag("LimitX-"))
+        life -= dmg;
+
+        if (life <= 0)
         {
-            // Cambiar dirección hacia la derecha
-            direction = Vector2.right;
-        }
-        // Si el enemigo colisiona con la pared limitante derecha (LimitX+)
-        else if (collision.gameObject.CompareTag("LimitX+"))
-        {
-            // Cambiar dirección hacia la izquierda
-            direction = Vector2.left;
-        }
-        // Si el enemigo colisiona con el límite superior (LimitY+)
-        else if (collision.gameObject.CompareTag("LimitY+"))
-        {
-            // Cambiar dirección hacia abajo en el eje Y
-            direction.y = -1;
-        }
-        // Si el enemigo colisiona con el límite inferior (LimitY-)
-        else if (collision.gameObject.CompareTag("LimitY-"))
-        {
-            // Cambiar dirección hacia arriba en el eje Y
-            direction.y = 1;
-        }
-        // Ignorar colisiones con otros enemigos
-        else if (collision.gameObject.CompareTag("Enemy"))
-        {
-            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-        }
-        // Ignorar colisiones con Food
-        else if (collision.gameObject.CompareTag("Food"))
-        {
-            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-        }
-        // Ignorar colisiones con Organismo
-        else if (collision.gameObject.CompareTag("Organismo"))
-        {
-            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-        }
-        // Si colisiona con el jugador
-        else if (collision.gameObject.CompareTag("Player"))
-        {
-            Player p = collision.gameObject.GetComponent<Player>();
-            if (p != null)
+            // Generar ADN fuerte al morir
+            Instantiate(ADNStrong, transform.position, transform.rotation);
+
+            ADNstrongValue = type switch
             {
-                Debug.Log($"El enemigo de tipo {type} ha infligido {damage} puntos de daño al jugador.");
-                p.TakeDamage(damage);
-            }
+                EnemyType.EVO1 => 3,
+                EnemyType.EVO2 => 6,
+                EnemyType.EVO3 => 9,
+                _ => 20,
+            };
+
+            PuntuacionManager.intance.ActualizarADNfuerte(ADNstrongValue);
+
+            Destroy(gameObject);
         }
     }
+
+    // Rotación hacia el jugador
+    void RotateToTarget()
+    {
+        // Calcular la dirección hacia el jugador
+        Vector2 dir = target.position - transform.position;
+
+        // Calcular el ángulo de rotación (en grados) hacia el jugador
+        float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+        // Aplicar la rotación al enemigo
+        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+    }
+
+    // Rotación hacia el movimiento del enemigo
+    void RotateMovement()
+    {
+        // Calcular la dirección de movimiento (movimiento aleatorio)
+        Vector2 dir = rb.velocity;
+
+        if (dir.sqrMagnitude > 0.01f) // Evitar rotación cuando no hay movimiento
+        {
+            // Calcular el ángulo de rotación basado en la dirección del movimiento
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+
+            // Aplicar la rotación al enemigo
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        }
+    }
+
 
 
 }

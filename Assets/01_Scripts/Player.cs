@@ -8,6 +8,11 @@ public class Player : MonoBehaviour
 {
     public TiendaSkills tienda;
 
+    public float impactForce = 5f; // Fuerza del impacto
+    public float impactDuration = 0.5f; // Duración del impacto en segundos
+    private Vector2 movement;
+    private bool isImpacted = false;
+
     public float velocidadMovimiento = 5f;
     public int nivelMejorVelocidad = 0;
 
@@ -80,8 +85,9 @@ public class Player : MonoBehaviour
         textoVida.text = vidaActual.ToString() + "/" + vidaMaxima.ToString();
         textoComida.text = comidaActual.ToString() + "/" + comidaMaxima.ToString();
 
-        // Llamar a la función para mover el jugador
-        MoverJugador();
+        // Solo llamamos a la función para mover el jugador, sin modificar rb.velocity aquí.
+        movement.x = Input.GetAxis("Horizontal");
+        movement.y = Input.GetAxis("Vertical");
 
         // Llamar a la función para descontar comida
         DescontarComida();
@@ -136,10 +142,10 @@ public class Player : MonoBehaviour
         float movimientoY = Input.GetAxis("Vertical");   // W/S o Flechas arriba/abajo
 
         // Crear un vector de movimiento
-        Vector2 movimiento = new Vector2(movimientoX, movimientoY) * velocidadMovimiento;
+        movement = new Vector2(movimientoX, movimientoY) * velocidadMovimiento;
 
         // Aplicar el movimiento al Rigidbody2D
-        rb.velocity = movimiento;
+        rb.velocity = movement;
 
         // Limitar la posición del jugador dentro de los límites definidos
         Vector2 posicionJugador = rb.position;
@@ -169,6 +175,18 @@ public class Player : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if (collision.gameObject.CompareTag("Enemy"))
+        {
+
+            // Calcular la dirección del jugador al enemigo
+            Vector2 pushDirection = (transform.position - collision.transform.position).normalized;
+
+            // Aplica una fuerza de retroceso al jugador en la dirección opuesta
+            rb.AddForce(pushDirection * impactForce, ForceMode2D.Impulse);
+
+            // Inicia la rutina para restablecer la velocidad
+            StartCoroutine(ResetImpact());
+        }
         // Si colisiona con un organismo
         if (collision.gameObject.CompareTag("Organismo"))
         {
@@ -184,6 +202,38 @@ public class Player : MonoBehaviour
             comidaActual += 1;
             Destroy(collision.gameObject); // Destruye la comida
         }
+
+    }
+    void FixedUpdate()
+    {
+        if (!isImpacted)
+        {
+            // Mover el jugador usando velocity directamente
+            rb.velocity = movement * velocidadMovimiento;
+
+            // Limitar la velocidad máxima
+            if (rb.velocity.magnitude > 10.0f)
+            {
+                rb.velocity = rb.velocity.normalized * 10.0f;
+            }
+
+            // Rotar al jugador según la dirección del movimiento
+            if (movement.magnitude > 0)
+            {
+                float angle = Mathf.Atan2(movement.y, movement.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+            }
+            else
+            {
+                transform.rotation = Quaternion.identity; // Mantener la rotación predeterminada si no se mueve
+            }
+        }
+    }
+    private IEnumerator ResetImpact()
+    {
+        isImpacted = true;
+        yield return new WaitForSeconds(impactDuration);
+        isImpacted = false;
     }
 
     public void TakeDamage(float dmg)
