@@ -28,10 +28,10 @@ public class Player : MonoBehaviour
     public Text textoComida;
 
     // Valores de vida y comida
-    private float vidaMaxima = 10f;
-    private float vidaActual = 3f;
+    private float vidaMaxima = 100f;
+    private float vidaActual = 25f;
     private float comidaMaxima = 10f;
-    private float comidaActual = 0f;
+    private float comidaActual = 5f;
 
     // Puntos de ADN
     public int puntos = 0;
@@ -148,6 +148,23 @@ public class Player : MonoBehaviour
 
         // Actualizar la posición del jugador para que no sobrepase los límites
         rb.position = posicionJugador;
+
+        // Rotación del jugador según la dirección del movimiento
+        if (movimientoX != 0 || movimientoY != 0)
+        {
+            // Calcular el ángulo de rotación basado en la dirección del movimiento
+            float angulo = Mathf.Atan2(movimientoY, movimientoX) * Mathf.Rad2Deg;  // Convertir de radianes a grados
+
+            // Aplicar la rotación al jugador (esto hace que el jugador rote hacia la dirección en la que se mueve)
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angulo));
+        }
+
+        // Si no hay movimiento, el jugador mantiene la rotación predeterminada (como se hacía antes)
+        else
+        {
+            // Aseguramos que el jugador no gire si no hay movimiento
+            transform.rotation = Quaternion.Euler(Vector3.zero);
+        }
     }
 
     void OnCollisionEnter2D(Collision2D collision)
