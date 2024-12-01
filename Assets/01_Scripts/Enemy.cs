@@ -54,6 +54,7 @@ public class Enemy : MonoBehaviour
     // Actualización en cada frame
     void Update()
     {
+        SearchTarget();
         // Comportamiento según el tipo de enemigo
         switch (type)
         {
@@ -144,8 +145,12 @@ public class Enemy : MonoBehaviour
     // Movimiento hacia el jugador cuando esté dentro del rango
     void MoveTowardsPlayer()
     {
-        Vector2 direction = (target.position - transform.position).normalized;
-        rb.velocity = direction * speed;  // Mover al jugador con la velocidad del Rigidbody
+        if (targetInRange == true)
+        {
+            Vector2 direction = (target.position - transform.position).normalized;
+            rb.velocity = direction * speed;  // Mover al jugador con la velocidad del Rigidbody
+        }
+        
     }
 
     // Buscar al jugador dentro del rango
@@ -164,10 +169,20 @@ public class Enemy : MonoBehaviour
 
     // Colisiones con el jugador
     void OnCollisionEnter2D(Collision2D collision)
-{
+    {
+        // Ignorar colisiones con otros enemigos
+        if (collision.gameObject.CompareTag("LimitY-"))
+        {
+            // Si colisiona con el límite inferior, asignar una nueva posición aleatoria
+            targetPosition = GetRandomTargetPosition();  // Nueva posición aleatoria
 
-     // Ignorar colisiones con otros enemigos
-     if (collision.gameObject.CompareTag("Enemy"))
+            // Opcional: Cambiar la dirección del movimiento si lo deseas
+            Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+            rb.velocity = randomDirection * speed;  // Aplicar la nueva dirección con velocidad
+        }
+
+        // Ignorar colisiones con otros enemigos
+        if (collision.gameObject.CompareTag("Enemy"))
      {
          Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
      }
