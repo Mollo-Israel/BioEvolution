@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: -8532022706538234643}
   m_Layer: 0
   m_Name: NeutralEVO1
-  m_TagString: EnemyNeutral
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 1553780186040137548}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -1.7275, y: -1.1109, z: 0}
-  m_LocalScale: {x: 0.93787587, y: 0.88864446, z: 1}
+  m_LocalScale: {x: 0.6679646, y: 0.6329015, z: 0.71221}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0

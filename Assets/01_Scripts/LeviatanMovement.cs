@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class LeviatanMovement : MonoBehaviour
 {
-    public float moveSpeed = 10f;   // Velocidad de movimiento del Leviatán
+    public float moveSpeed = 30f;   // Velocidad de movimiento del Leviatán
 
     void Update()
     {
