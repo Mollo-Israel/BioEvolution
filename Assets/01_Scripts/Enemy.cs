@@ -1,11 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental.FileFormat;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Enemy : MonoBehaviour
 {
+
+    // Variables para neutrales
+    private GameObject foodTarget; // Objeto de comida detectado
+    public float foodDetectionRange = 5f; // Rango para detectar comida
     // Tipo de enemigo
     public EnemyType type;
 
@@ -81,11 +84,67 @@ public class Enemy : MonoBehaviour
             case EnemyType.NEVO1:
             case EnemyType.NEVO2:
             case EnemyType.NEVO3:
-                MoveToRandomPosition(); // Movimiento aleatorio
-                RotateMovement();  // Rotar hacia el movimiento aleatorio
+                ModifyAttributes(type);
+                // Buscar comida
+                SearchFood();
+                if (foodTarget != null)
+                {
+                    MoveTowardsFood();
+                    RotateToFood();
+                    
+                }
+                else
+                {
+                    MoveToRandomPosition();
+                    RotateMovement();
+                   
+                }
                 break;
         }
     }
+
+    // Buscar comida dentro del rango
+    void SearchFood()
+    {
+        // Encontrar todos los objetos con tag "Food"
+        GameObject[] foods = GameObject.FindGameObjectsWithTag("Food");
+
+        foodTarget = null; // Reiniciar el objetivo actual
+
+        float shortestDistance = foodDetectionRange;
+
+        foreach (var food in foods)
+        {
+            float distance = Vector2.Distance(transform.position, food.transform.position);
+            if (distance <= shortestDistance)
+            {
+                shortestDistance = distance;
+                foodTarget = food; // Asignar el alimento más cercano como objetivo
+            }
+        }
+    }
+
+    // Mover hacia la comida
+    void MoveTowardsFood()
+    {
+        if (foodTarget != null)
+        {
+            Vector2 direction = ((Vector2)foodTarget.transform.position - (Vector2)transform.position).normalized;
+            rb.velocity = direction * speed;
+        }
+    }
+
+    // Rotar hacia la comida
+    void RotateToFood()
+    {
+        if (foodTarget != null)
+        {
+            Vector2 dir = foodTarget.transform.position - transform.position;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        }
+    }
+
 
     // Ajustar atributos según el tipo de enemigo
     public void ModifyAttributes(EnemyType type)
@@ -93,29 +152,50 @@ public class Enemy : MonoBehaviour
         if (type == EnemyType.EVO1)
         {
             damage = 1;
-            range = 0.5f;
+            range = 3;
             maxLife = 10;
             speed = 0.5f;
         }
         else if (type == EnemyType.EVO2)
         {
             damage = 3;
-            range = 1;
+            range = 5;
             maxLife = 20;
             speed = 1;
         }
         else if (type == EnemyType.EVO3)
         {
             damage = 5;
-            range = 2;
+            range = 6;
             maxLife = 40;
             speed = 2;
         }
-        else
+        else if(type == EnemyType.EVO4)
         {
             damage = 10;
-            range = 3;
+            range = 9;
             maxLife = 80;
+            speed = 3;
+        }
+        else if (type == EnemyType.NEVO1)
+        {
+            damage = 2;
+            range = 3;
+            maxLife = 20;
+            speed = 3;
+        }
+        else if (type == EnemyType.NEVO2)
+        {
+            damage = 7;
+
+            maxLife = 60;
+            speed = 3;
+        }
+        else if (type == EnemyType.NEVO3)
+        {
+            damage = 3;
+    
+            maxLife = 40;
             speed = 3;
         }
     }
@@ -166,47 +246,76 @@ public class Enemy : MonoBehaviour
             targetInRange = false;
         }
     }
-
-    // Colisiones con el jugador
+    // Colisiones con diferentes objetos
     void OnCollisionEnter2D(Collision2D collision)
     {
-        // Ignorar colisiones con otros enemigos
-        if (collision.gameObject.CompareTag("LimitY-"))
+        // Si el enemigo neutral colisiona con la comida
+        if (collision.gameObject.CompareTag("Food") &&
+            (type == EnemyType.NEVO1 || type == EnemyType.NEVO2 || type == EnemyType.NEVO3))
         {
-            // Si colisiona con el límite inferior, asignar una nueva posición aleatoria
-            targetPosition = GetRandomTargetPosition();  // Nueva posición aleatoria
-
-            // Opcional: Cambiar la dirección del movimiento si lo deseas
-            Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
-            rb.velocity = randomDirection * speed;  // Aplicar la nueva dirección con velocidad
+            Destroy(collision.gameObject); // Destruir la comida al tocarla
+            foodTarget = null; // Resetear el objetivo
         }
+        // Si el enemigo neutral colisiona con el límite "LimitY-", solo cambia su posición y no se destruye
+        else if (collision.gameObject.CompareTag("LimitY-") &&
+                 (type == EnemyType.NEVO1 || type == EnemyType.NEVO2 || type == EnemyType.NEVO3))
+        {
+            targetPosition = GetRandomTargetPosition(); // Generar una nueva posición aleatoria
 
-        // Ignorar colisiones con otros enemigos
-        if (collision.gameObject.CompareTag("Enemy"))
-     {
-         Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-     }
-     // Ignorar colisiones con Food
-     else if (collision.gameObject.CompareTag("Food"))
-     {
-         Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-     }
-     // Ignorar colisiones con Organismo
-     else if (collision.gameObject.CompareTag("Organismo"))
-     {
-         Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
-     }
-     // Si colisiona con el jugador
-     else if (collision.gameObject.CompareTag("Player"))
-     {
-         Player p = collision.gameObject.GetComponent<Player>();
-         if (p != null)
-         {
-             Debug.Log($"El enemigo de tipo {type} ha infligido {damage} puntos de daño al jugador.");
-             p.TakeDamage(damage);
-         }
-     }
-}
+            // Cambiar dirección aleatoria al colisionar con el límite
+            Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+            rb.velocity = randomDirection * speed; // Aplicar velocidad en la nueva dirección
+        }
+        // Ignorar colisiones entre enemigos (cazadores y neutrales)
+        else if (collision.gameObject.CompareTag("Enemy"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        // Ignorar colisiones con la comida
+        else if (collision.gameObject.CompareTag("Food"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        // Ignorar colisiones con organismos
+        else if (collision.gameObject.CompareTag("Organismo"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        // Ignorar colisiones con organismos
+        else if (collision.gameObject.CompareTag("2x"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        else if (collision.gameObject.CompareTag("SeaNormal"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        else if (collision.gameObject.CompareTag("SeaStrong"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        else if (collision.gameObject.CompareTag("PredatorMode"))
+        {
+            Physics2D.IgnoreCollision(collision.collider, GetComponent<Collider2D>());
+        }
+        // Si un enemigo neutral colisiona con el jugador, no inflige daño
+        else if (collision.gameObject.CompareTag("Player") &&
+                 (type == EnemyType.NEVO1 || type == EnemyType.NEVO2 || type == EnemyType.NEVO3))
+        {
+            Debug.Log($"El enemigo neutral de tipo {type} no inflige daño al jugador.");
+        }
+        // Si un enemigo cazador (EVO) colisiona con el jugador, inflige daño
+        else if (collision.gameObject.CompareTag("Player"))
+        {
+            Player p = collision.gameObject.GetComponent<Player>();
+            if (p != null)
+            {
+                Debug.Log($"El enemigo de tipo {type} ha infligido {damage} puntos de daño al jugador.");
+                p.TakeDamage(damage);
+            }
+        }
+    }
+
 
     // Al recibir daño
     public void TakeDamage(float dmg)

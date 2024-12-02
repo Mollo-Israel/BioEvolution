@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 8734997137718479717}
   m_Layer: 0
   m_Name: NeutralEVO3
-  m_TagString: EnemyNeutral
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -46,6 +46,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 185464075e3c73942befc92b84db197b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  foodDetectionRange: 5
   type: 6
   maxLife: 3
   speed: 2

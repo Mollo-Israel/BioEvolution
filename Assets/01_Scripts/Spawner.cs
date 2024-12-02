@@ -10,14 +10,14 @@ public class Spawner : MonoBehaviour
     public AudioClip entradaLeviatanClip;    // Clip para el sonido de la entrada del Leviatán
     public GameObject leviatanPrefab;        // El prefab del Leviatán
     public Transform spawnPoint;             // Punto de aparición del Leviatán
-    public int minutes = 2;                  // Cambia los minutos a 2
-    public int seconds = 30;                 // Cambia los segundos a 30
+    public int minutes = 2;                  // Tiempo en minutos (reinicia a 2 minutos)
+    public int seconds = 30;                 // Tiempo en segundos
     public Text timerText;                   // Texto del temporizador en la UI
 
     private int totalTime;                   // Tiempo total en segundos
     private bool leviatanSpawned = false;    // Para evitar que el Leviatán se instancie varias veces
     private Color originalColor;             // Color original del texto del temporizador
-    private float redThreshold = 8f;          // Umbral para empezar a cambiar el color (8 segundos)
+    private float redThreshold = 8f;         // Umbral para empezar a cambiar el color (8 segundos)
 
     void Start()
     {
@@ -44,28 +44,37 @@ public class Spawner : MonoBehaviour
 
     IEnumerator TimeCountdown()
     {
-        while (totalTime > 0)
+        while (true) // Repetir indefinidamente
         {
-            yield return new WaitForSeconds(1);
-            totalTime--;  // Disminuye el tiempo en cada segundo
-
-            // Mostrar en la consola el tiempo restante para depuración
-            Debug.Log("Tiempo restante: " + totalTime);
-
-            // Reproducir el sonido del reloj si quedan 8 segundos
-            if (totalTime == 8 && !audioSource.isPlaying)  // Verifica si quedan 8 segundos y si no está sonando
+            while (totalTime > 0)
             {
-                Debug.Log("Reproduciendo sonido de reloj...");
-                audioSource.PlayOneShot(relojClip);  // Reproduce el sonido del reloj
+                yield return new WaitForSeconds(1);
+                totalTime--;  // Disminuye el tiempo en cada segundo
+
+                // Mostrar en la consola el tiempo restante para depuración
+                Debug.Log("Tiempo restante: " + totalTime);
+
+                // Reproducir el sonido del reloj si quedan 8 segundos
+                if (totalTime == 8 && !audioSource.isPlaying)  // Verifica si quedan 8 segundos y si no está sonando
+                {
+                    Debug.Log("Reproduciendo sonido de reloj...");
+                    audioSource.PlayOneShot(relojClip);  // Reproduce el sonido del reloj
+                }
+
+                UpdateTimerText(); // Actualiza el texto del temporizador
             }
 
-            UpdateTimerText(); // Actualiza el texto del temporizador
-        }
+            // Si el Leviatán aún no ha sido instanciado
+            if (!leviatanSpawned)
+            {
+                SpawnLeviatan();  // Instancia el Leviatán
+            }
 
-        // Si el Leviatán aún no ha sido instanciado
-        if (!leviatanSpawned)
-        {
-            SpawnLeviatan();  // Instancia el Leviatán
+            // Reinicia el temporizador a 2 minutos y 30 segundos
+            totalTime = (minutes * 60) + seconds;
+            leviatanSpawned = false; // Permitir que el Leviatán vuelva a aparecer
+            UpdateTimerText(); // Actualiza el texto al reiniciar
+            Debug.Log("Temporizador reiniciado a 2:30");
         }
     }
 
@@ -81,4 +90,3 @@ public class Spawner : MonoBehaviour
         Debug.Log("Leviatán instanciado");
     }
 }
-

@@ -33,7 +33,7 @@ public class Player : MonoBehaviour
     public Text textoComida;
 
     // Valores de vida y comida
-    private float vidaMaxima = 100f;
+    private float vidaMaxima = 25f;
     private float vidaActual = 25f;
     private float comidaMaxima = 10f;
     private float comidaActual = 5f;
@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
     public float limiteDerecho = 24f;
     public float limiteInferior = -20f;
     public float limiteSuperior = 20f;
+
 
     public Text textoCostoMejora;
     public Text textoPuntos;
@@ -73,7 +74,6 @@ public class Player : MonoBehaviour
     private float twoXTimer = 0f;
     private float comidaMultiplicador = 1f;  // Multiplicador de comida
     private float adnMultiplicador = 1f;  // Multiplicador de ADN
-
 
     void Start()
     {
@@ -205,14 +205,31 @@ public class Player : MonoBehaviour
             }
         }
 
-        // Si la comida es 0, no descontamos más comida
+        // Si la comida es 0, restamos vida
         if (comidaActual <= 0)
         {
-            comidaActual = 0;  // Asegura que la comida no baje de 0
+            comidaActual = 0; // Asegura que la comida no baje de 0
             textoComida.text = comidaActual.ToString() + "/" + comidaMaxima.ToString(); // Actualiza el texto de la comida
             barraComida.fillAmount = comidaActual / comidaMaxima; // Actualiza la barra de comida
+
+            // Temporizador para restar vida gradualmente cuando no hay comida
+            timerComida += Time.deltaTime;
+
+            if (timerComida >= tiempoRestarVida) // Si el temporizador excede el tiempo para perder vida
+            {
+                RestarVida(1f); // Resta 1 de vida cada ciclo
+                timerComida = 0f; // Reinicia el temporizador
+            }
+
+            // Si la vida llega a 0, el jugador muere
+            if (vidaActual <= 0)
+            {
+                Destroy(gameObject); // Destruye el jugador
+                SceneManager.LoadScene("Start_Game");
+            }
         }
     }
+
 
     void MoverJugador()
     {
